@@ -60,6 +60,6 @@ public class StudentDaoTest {
 
     @Test
     public void lll() {
-        System.out.println("wljjjjj");
+        System.out.println("wljjjjj+++");
     }
 }
