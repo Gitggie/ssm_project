@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+        在mybatis中，映射文件中的namespace是用于绑定Dao接口的，即面向接口编程。
+        （我的理解是mapper.xml对应的mapperInterface接口（这个类在spring中得到体现）绑定dao接口）
+        当你的namespace绑定接口后，你可以不用写接口实现类，mybatis会通过该绑定自动
+        帮你找到对应要执行的SQL语句-->
+<mapper namespace="com.wlj.dao.StudentDao">
+
+    <!--设置domain类和数据库中表的字段一一对应，注意数据库字段和domain类中的字段名称不致，此处一定要！-->
+    <!--jsp页面与数据库建立映射关系,使前端页面能够获得数据库数据-->
+    <resultMap id="BaseResultMap" type="Student">
+        <id column="id" property="id"/>
+        <result column="user_name" property="user_name"/>
+    </resultMap>
+
+    <!--查询所有学生记录-->
+    <select id="getAll" resultType="Student">
+        select id,user_name from student
+    </select>
+
+    <select id="selectById" parameterType="int" resultMap="BaseResultMap">
+        SELECT * FROM student WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="Student">
+        INSERT into student (id,user_name) VALUES (#{id},#{user_name})
+    </insert>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM student WHERE id=#{id}
+    </delete>
+
+    <update id="update" parameterType="Student">
+        UPDATE student SET user_name=#{user_name} where id=#{id}
+    </update>
+</mapper>

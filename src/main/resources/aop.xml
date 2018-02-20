@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-4.2.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean id="helloWorldImpl1" class="com.wlj.aop.HelloWorldImpl1"/>
+    <bean id="helloWorldImpl2" class="com.wlj.aop.HelloWorldImpl2"/>
+    <bean id="timeHandler" class="com.wlj.aop.TimeHandler"/>
+    <bean id="logHandler" class="com.wlj.aop.LogHandler"/>
+
+    <aop:config>
+        <!--给HelloWorld接口的两个实现类的所有方法都加上了代理，代理内容就是打印时间,打印日志-->
+        <!--order属性的数字就是横切关注点的顺序，切面aspect是对横切关注点的抽象-->
+        <aop:aspect id="time" ref="timeHandler" order="1">
+            <aop:pointcut id="addAllMethod" expression="execution(* com.wlj.aop.HelloWorld.print*(..))"/>
+            <aop:before method="printTime" pointcut-ref="addAllMethod"/>
+            <aop:after method="printTime" pointcut-ref="addAllMethod"/>
+        </aop:aspect>
+
+
+        <aop:aspect id="log" ref="logHandler" order="2">
+            <aop:pointcut id="printLog" expression="execution(* com.wlj.aop.HelloWorld.do*(..))"/>
+            <aop:before method="LogBefore" pointcut-ref="printLog"/>
+            <aop:after method="LogAfter" pointcut-ref="printLog"/>
+        </aop:aspect>
+    </aop:config>
+
+
+
+
+
+
+    <context:component-scan base-package="com.wlj.aop2"/>
+    <!-- 开启aop注解方式，此步骤s不能少，这样java类中的aop注解才会生效 -->
+    <aop:aspectj-autoproxy/>
+    <!--注意：我们不仅仅要引入Aop的名称空间，还要在xsi:schemaLocation中加入aop的xsd文件 ,缺一不可-->
+    <!--否则会报错：通配符的匹配很全面, 但无法找到元素 'aop:aspectj-autoproxy' 的声明。-->
+
+
+
+
+
+
+
+
+    <bean id="personServiceBean" class="com.wlj.aop3.PersonServiceBean"/>
+    <bean id="myInterceptor" class="com.wlj.aop3.MyInterceptor"/>
+
+
+</beans>

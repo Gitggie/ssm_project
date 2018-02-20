@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--把jdbc.properties配置文件传入-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <!--配置数据源-->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc_driver}"/>
+        <property name="url" value="${jdbc_url}"/>
+        <property name="username" value="${jdbc_username}"/>
+        <property name="password" value="${jdbc_password}"/>
+    </bean>
+
+    <!--配置会话工厂-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mapperLocations" value="classpath:StudentMapper.xml"/>
+        <property name="typeAliasesPackage" value="com.wlj.domain"/>
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+    </bean>
+
+    <!--配置会话-->
+    <bean id="sqlsession" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+        <!--应该是用于扫描dao层的接口。在这个接口里写的方法不必有实现类，只要在mapper文件里有对应id的sql语句就能使用。-->
+        <!--此value要与mapper.xml文件中的namespace对应-->
+        <!--mapperInterface就是对应的mapper.xml的接口-->
+        <property name="mapperInterface" value="com.wlj.dao.StudentDao"/>
+    </bean>
+
+    <!-- 自动扫描注解的bean -->
+    <context:component-scan base-package="com.wlj.service"/>
+    <context:component-scan base-package="com.wlj.dao"/>
+
+
+    <!--aop4-->
+    <bean id="logAspect" class="com.wlj.aop4.LogAspect"/>
+    <bean id="mouse" class="com.wlj.aop4.Mouse"/>
+
+    <aop:config>
+        <aop:pointcut id="logPointCut" expression="execution( * com.wlj.aop4.Mouse.*(..))"/>
+        <aop:aspect ref="logAspect">
+            <aop:around pointcut-ref="logPointCut" method="invoke"/>
+        </aop:aspect>
+    </aop:config>
+
+
+    <!--aop5-->
+    <bean id="LogAdvice" class="com.wlj.aop5.LogAdvice"/>
+
+    <aop:config>
+        <aop:pointcut id="pct" expression="execution(* com.wlj.service.*Impl.*(..))"/>
+        <aop:aspect id="myAspect" ref="LogAdvice">
+            <aop:around method="around" pointcut-ref="pct"/>
+        </aop:aspect>
+    </aop:config>
+
+</beans>
