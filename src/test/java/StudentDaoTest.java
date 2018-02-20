@@ -58,4 +58,8 @@ public class StudentDaoTest {
         System.out.println(student);
     }
 
+    @Test
+    public void lll() {
+        System.out.println("wlj");
+    }
 }
